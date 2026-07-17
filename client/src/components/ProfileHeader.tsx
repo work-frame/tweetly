@@ -31,7 +31,7 @@ export function ProfileHeader({
     const nowFollowing = await followService.toggleFollow(currentUserId, profileUser.id)
     setIsFollowing(nowFollowing)
     setLoading(false)
-    onFollowChange() // tell parent to re-fetch updated counts
+    onFollowChange()
   }
 
   const joinedDate = new Date(profileUser.createdAt).toLocaleDateString('en-US', {
@@ -45,7 +45,7 @@ export function ProfileHeader({
         <Avatar
           src={profileUser.avatarUrl}
           alt={profileUser.displayName}
-          className="h-20 w-20"
+          className="h-32 w-32"
           clickable
         />
 

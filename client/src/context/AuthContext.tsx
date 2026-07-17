@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import type { User } from '../types/User'
 import { authService } from '../services/authService'
-import { updateUser } from '../mocks/usersStore'
+import { userService } from '../services/userService'
 
 interface AuthContextType {
   user: User | null
@@ -27,7 +27,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // on first load, check if a session was saved
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
@@ -59,11 +58,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     setUser(null)
     localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem('tweetly_token')
   }
 
   async function updateProfile(updates: Partial<User>) {
     if (!user) return
-    const updated = updateUser(user.id, updates)
+    const updated = await userService.updateProfile({
+      displayName: updates.displayName,
+      bio: updates.bio,
+      avatarUrl: updates.avatarUrl,
+    })
     persistUser(updated)
   }
 

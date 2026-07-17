@@ -1,7 +1,6 @@
-  import { useEffect, useState } from 'react'
-import type { Tweet } from '../types/Tweet'
+import { useEffect, useState } from 'react'
 import { tweetService } from '../services/tweetService'
-import { loadUsers } from '../mocks/usersStore'
+import type { FeedTweet } from '../services/tweetService'
 import { useAuth } from '../context/AuthContext'
 import { Composer } from '../components/Composer'
 import { TweetCard } from '../components/TweetCard'
@@ -10,7 +9,7 @@ const PAGE_SIZE = 3
 
 export function Feed() {
   const { user } = useAuth()
-  const [tweets, setTweets] = useState<Tweet[]>([])
+  const [tweets, setTweets] = useState<FeedTweet[]>([])
   const [loading, setLoading] = useState(true)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
@@ -34,20 +33,24 @@ export function Feed() {
 
   async function handleToggleLike(tweetId: string) {
     await tweetService.toggleLike(tweetId)
-    // refresh data without resetting how many tweets are visible
-    const data = await tweetService.getFeed()
-    setTweets(data)
+    setTweets((prev) =>
+      prev.map((tweet) =>
+        tweet.id === tweetId
+          ? {
+              ...tweet,
+              likedByCurrentUser: !tweet.likedByCurrentUser,
+              likesCount: tweet.likedByCurrentUser
+                ? tweet.likesCount - 1
+                : tweet.likesCount + 1,
+            }
+          : tweet
+      )
+    )
   }
 
   async function handleDelete(tweetId: string) {
     await tweetService.deleteTweet(tweetId)
-    const data = await tweetService.getFeed()
-    setTweets(data)
-  }
-
-  function findAuthor(authorId: string) {
-    if (user && user.id === authorId) return user
-    return loadUsers().find((u) => u.id === authorId)
+    setTweets((prev) => prev.filter((tweet) => tweet.id !== tweetId))
   }
 
   function handleLoadMore() {
@@ -73,7 +76,7 @@ export function Feed() {
             <TweetCard
               key={tweet.id}
               tweet={tweet}
-              author={findAuthor(tweet.authorId)}
+              author={tweet.author}
               currentUserId={user?.id ?? ''}
               onToggleLike={handleToggleLike}
               onDelete={handleDelete}

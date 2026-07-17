@@ -1,0 +1,6 @@
+require('dotenv').config()
+const { Pool } = require('pg')
+const pool = new Pool({ connectionString: process.env.DIRECT_URL, connectionTimeoutMillis: 30000 })
+pool.query('SELECT NOW()')
+  .then((res) => { console.log('Connection succeeded:', res.rows[0]); pool.end() })
+  .catch((err) => { console.error('Connection failed:', err.message); pool.end() })

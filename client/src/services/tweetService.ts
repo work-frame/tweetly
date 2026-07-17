@@ -1,70 +1,69 @@
+import { apiFetch } from './api'
 import type { Tweet } from '../types/Tweet'
-import { mockTweets } from '../mocks/tweets'
+import type { User } from '../types/User'
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-const TWEETS_STORAGE_KEY = 'tweetly_tweets_db'
-
-function loadTweets(): Tweet[] {
-  const stored = localStorage.getItem(TWEETS_STORAGE_KEY)
-  if (stored) return JSON.parse(stored)
-  localStorage.setItem(TWEETS_STORAGE_KEY, JSON.stringify(mockTweets))
-  return [...mockTweets]
+interface ApiTweet {
+  id: string
+  content: string
+  author_id: string
+  created_at: string
+  likes_count: number
+  liked_by_current_user: boolean
+  username?: string
+  display_name?: string
+  avatar_url?: string
 }
 
-function saveTweets(tweets: Tweet[]) {
-  localStorage.setItem(TWEETS_STORAGE_KEY, JSON.stringify(tweets))
+export interface FeedTweet extends Tweet {
+  author: Pick<User, 'username' | 'displayName' | 'avatarUrl'>
+}
+
+function mapTweet(apiTweet: ApiTweet): Tweet {
+  return {
+    id: apiTweet.id,
+    content: apiTweet.content,
+    authorId: apiTweet.author_id,
+    createdAt: apiTweet.created_at,
+    likesCount: apiTweet.likes_count,
+    likedByCurrentUser: apiTweet.liked_by_current_user,
+  }
+}
+
+function mapFeedTweet(apiTweet: ApiTweet): FeedTweet {
+  return {
+    ...mapTweet(apiTweet),
+    author: {
+      username: apiTweet.username ?? '',
+      displayName: apiTweet.display_name ?? 'Unknown user',
+      avatarUrl: apiTweet.avatar_url ?? '',
+    },
+  }
 }
 
 export const tweetService = {
-  async getFeed(): Promise<Tweet[]> {
-    await delay(500)
-    const tweets = loadTweets()
-    return [...tweets].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+  async getFeed(): Promise<FeedTweet[]> {
+    const data: ApiTweet[] = await apiFetch('/tweets/feed?limit=50')
+    return data.map(mapFeedTweet)
   },
 
   async getTweetsByUser(userId: string): Promise<Tweet[]> {
-    await delay(300)
-    return loadTweets().filter((t) => t.authorId === userId)
+    const data: ApiTweet[] = await apiFetch(`/tweets/user/${userId}`)
+    return data.map(mapTweet)
   },
 
-  async createTweet(content: string, authorId: string): Promise<Tweet> {
-    await delay(400)
-    const tweets = loadTweets()
-    const newTweet: Tweet = {
-      id: `t${Date.now()}`,
-      content,
-      authorId,
-      createdAt: new Date().toISOString(),
-      likesCount: 0,
-      likedByCurrentUser: false,
-    }
-    saveTweets([newTweet, ...tweets])
-    return newTweet
+  async createTweet(content: string, _authorId: string): Promise<Tweet> {
+    const data: ApiTweet = await apiFetch('/tweets', {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    })
+    return mapTweet(data)
   },
 
   async deleteTweet(tweetId: string): Promise<void> {
-    await delay(300)
-    const tweets = loadTweets()
-    saveTweets(tweets.filter((t) => t.id !== tweetId))
+    await apiFetch(`/tweets/${tweetId}`, { method: 'DELETE' })
   },
 
-  async toggleLike(tweetId: string): Promise<Tweet> {
-    await delay(200)
-    const tweets = loadTweets()
-    const updated = tweets.map((t) =>
-      t.id === tweetId
-        ? {
-            ...t,
-            likedByCurrentUser: !t.likedByCurrentUser,
-            likesCount: t.likedByCurrentUser ? t.likesCount - 1 : t.likesCount + 1,
-          }
-        : t
-    )
-    saveTweets(updated)
-    const found = updated.find((t) => t.id === tweetId)
-    if (!found) throw new Error('Tweet not found')
-    return found
+  async toggleLike(tweetId: string): Promise<void> {
+    await apiFetch(`/likes/${tweetId}/toggle`, { method: 'POST' })
   },
 }

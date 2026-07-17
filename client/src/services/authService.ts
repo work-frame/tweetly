@@ -1,67 +1,54 @@
+import { apiFetch } from './api'
 import type { User } from '../types/User'
-import { mockUsers } from '../mocks/users'
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-const USERS_STORAGE_KEY = 'tweetly_users_db'
-
-function loadUsers(): User[] {
-  const stored = localStorage.getItem(USERS_STORAGE_KEY)
-  if (stored) {
-    return JSON.parse(stored)
+interface AuthResponse {
+  user: {
+    id: string
+    username: string
+    display_name: string
+    email: string
+    bio: string
+    avatar_url: string
+    created_at: string
   }
-  // first time ever loading — seed with mock users and save
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(mockUsers))
-  return [...mockUsers]
+  token: string
 }
 
-function saveUsers(users: User[]) {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users))
+function mapUser(apiUser: AuthResponse['user']): User {
+  return {
+    id: apiUser.id,
+    username: apiUser.username,
+    displayName: apiUser.display_name,
+    email: apiUser.email,
+    bio: apiUser.bio,
+    avatarUrl: apiUser.avatar_url,
+    followersCount: 0,
+    followingCount: 0,
+    createdAt: apiUser.created_at,
+  }
 }
 
 export const authService = {
-  async login(email: string, _password: string): Promise<User> {
-    await delay(600)
-    const users = loadUsers()
-    const user = users.find((u) => u.email === email)
-    if (!user) {
-      throw new Error('Invalid email or password')
-    }
-    return user
+  async login(email: string, password: string): Promise<User> {
+    const data: AuthResponse = await apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+    localStorage.setItem('tweetly_token', data.token)
+    return mapUser(data.user)
   },
 
   async signup(
     displayName: string,
     username: string,
     email: string,
-    _password: string
+    password: string
   ): Promise<User> {
-    await delay(600)
-    const users = loadUsers()
-
-    const existingEmail = users.find((u) => u.email === email)
-    if (existingEmail) {
-      throw new Error('An account with this email already exists.')
-    }
-
-    const existingUsername = users.find((u) => u.username === username)
-    if (existingUsername) {
-      throw new Error('This username is already taken.')
-    }
-
-    const newUser: User = {
-      id: `u${Date.now()}`,
-      username,
-      displayName,
-      email,
-      bio: '',
-      avatarUrl: '',
-      followersCount: 0,
-      followingCount: 0,
-      createdAt: new Date().toISOString(),
-    }
-
-    saveUsers([...users, newUser])
-    return newUser
+    const data: AuthResponse = await apiFetch('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ displayName, username, email, password }),
+    })
+    localStorage.setItem('tweetly_token', data.token)
+    return mapUser(data.user)
   },
 }

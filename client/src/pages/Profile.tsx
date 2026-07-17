@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { User } from '../types/User'
 import type { Tweet } from '../types/Tweet'
-import { loadUsers } from '../mocks/usersStore'
+import { userService } from '../services/userService'
 import { tweetService } from '../services/tweetService'
 import { useAuth } from '../context/AuthContext'
 import { ProfileHeader } from '../components/ProfileHeader'
@@ -22,43 +22,45 @@ export function Profile() {
     loadProfile()
   }, [username])
 
-  function findUserByUsername(uname: string | undefined): User | null {
-    if (!uname) return null
-    const users = loadUsers()
-    return users.find((u) => u.username === uname) ?? null
-  }
-
   async function loadProfile() {
+    if (!username) return
     setLoading(true)
-    const foundUser = findUserByUsername(username)
-    setProfileUser(foundUser)
-
-    if (foundUser) {
+    try {
+      const foundUser = await userService.getUserByUsername(username)
+      setProfileUser(foundUser)
       const userTweets = await tweetService.getTweetsByUser(foundUser.id)
       setTweets(userTweets)
+    } catch {
+      setProfileUser(null)
     }
     setLoading(false)
   }
 
   async function handleToggleLike(tweetId: string) {
     await tweetService.toggleLike(tweetId)
-    if (profileUser) {
-      const userTweets = await tweetService.getTweetsByUser(profileUser.id)
-      setTweets(userTweets)
-    }
+    setTweets((prev) =>
+      prev.map((tweet) =>
+        tweet.id === tweetId
+          ? {
+              ...tweet,
+              likedByCurrentUser: !tweet.likedByCurrentUser,
+              likesCount: tweet.likedByCurrentUser
+                ? tweet.likesCount - 1
+                : tweet.likesCount + 1,
+            }
+          : tweet
+      )
+    )
   }
 
   async function handleDelete(tweetId: string) {
     await tweetService.deleteTweet(tweetId)
-    if (profileUser) {
-      const userTweets = await tweetService.getTweetsByUser(profileUser.id)
-      setTweets(userTweets)
-    }
+    setTweets((prev) => prev.filter((tweet) => tweet.id !== tweetId))
   }
 
   function handleEditClose() {
     setIsEditing(false)
-    loadProfile() // refresh to show updated info
+    loadProfile()
   }
 
   if (loading) {
