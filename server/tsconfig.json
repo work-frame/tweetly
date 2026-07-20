@@ -23,6 +23,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["src", "add-comments-table.cjs"],
   "exclude": ["node_modules", "dist", "prisma"]
 }

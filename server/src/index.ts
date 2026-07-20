@@ -7,6 +7,7 @@ import tweetRoutes from './routes/tweetRoutes.js'
 import followRoutes from './routes/followRoutes.js'
 import likeRoutes from './routes/likeRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import commentRoutes from './routes/commentRoutes.js'
 import { requireAuth, type AuthRequest } from './middleware/requireAuth.js'
 
 dotenv.config()
@@ -47,6 +48,7 @@ app.use('/api/tweets', tweetRoutes)
 app.use('/api/follows', followRoutes)
 app.use('/api/likes', likeRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/comments', commentRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
