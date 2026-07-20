@@ -19,7 +19,7 @@ export async function createTweet(req: AuthRequest, res: Response) {
     const result = await pool.query(
       `INSERT INTO tweets (content, author_id)
        VALUES ($1, $2)
-       RETURNING id, content, author_id, created_at`,
+       RETURNING id, content, author_id, created_at, views_count`,
       [content.trim(), authorId]
     )
     res.status(201).json(result.rows[0])
@@ -59,7 +59,7 @@ export async function getFeed(req: AuthRequest, res: Response) {
   try {
     const result = await pool.query(
       `SELECT
-         t.id, t.content, t.created_at, t.author_id,
+         t.id, t.content, t.created_at, t.author_id, t.views_count,
          u.username, u.display_name, u.avatar_url,
          COUNT(DISTINCT l.id)::int AS likes_count,
          EXISTS(
@@ -74,6 +74,18 @@ export async function getFeed(req: AuthRequest, res: Response) {
        LIMIT $2 OFFSET $3`,
       [currentUserId, limit, offset]
     )
+
+    const tweetIds = result.rows.map((row) => row.id)
+    if (tweetIds.length > 0) {
+      await pool.query(
+        `UPDATE tweets SET views_count = views_count + 1 WHERE id = ANY($1::text[])`,
+        [tweetIds]
+      )
+      result.rows.forEach((row) => {
+        row.views_count = row.views_count + 1
+      })
+    }
+
     res.json(result.rows)
   } catch (err) {
     console.error(err)
@@ -88,7 +100,7 @@ export async function getTweetsByUser(req: AuthRequest, res: Response) {
   try {
     const result = await pool.query(
       `SELECT
-         t.id, t.content, t.created_at, t.author_id,
+         t.id, t.content, t.created_at, t.author_id, t.views_count,
          u.username, u.display_name, u.avatar_url,
          COUNT(DISTINCT l.id)::int AS likes_count,
          EXISTS(
