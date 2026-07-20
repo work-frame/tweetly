@@ -9,6 +9,7 @@ interface ApiTweet {
   created_at: string
   likes_count: number
   liked_by_current_user: boolean
+  views_count: number
   username?: string
   display_name?: string
   avatar_url?: string
@@ -26,6 +27,7 @@ function mapTweet(apiTweet: ApiTweet): Tweet {
     createdAt: apiTweet.created_at,
     likesCount: apiTweet.likes_count,
     likedByCurrentUser: apiTweet.liked_by_current_user,
+    viewsCount: apiTweet.views_count,
   }
 }
 

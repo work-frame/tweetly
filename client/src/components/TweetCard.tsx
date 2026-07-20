@@ -84,6 +84,10 @@ export function TweetCard({
                 💬 {showComments ? 'Hide comments' : 'Comments'}
               </button>
 
+              <span className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-600">
+                👁️ {tweet.viewsCount}
+              </span>
+
               {isOwner && (
                 <button
                   onClick={() => onDelete(tweet.id)}

@@ -5,4 +5,5 @@ export interface Tweet {
   createdAt: string
   likesCount: number
   likedByCurrentUser: boolean
+  viewsCount: number
 }
