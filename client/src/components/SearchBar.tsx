@@ -1,12 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { User } from '../types/User'
-import { loadUsers } from '../mocks/usersStore'
+import { apiFetch } from '../services/api'
 import { Avatar } from './Avatar'
+
+interface SearchResult {
+  id: string
+  username: string
+  display_name: string
+  avatar_url: string
+}
 
 export function SearchBar() {
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<User[]>([])
+  const [results, setResults] = useState<SearchResult[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -18,15 +24,19 @@ export function SearchBar() {
       return
     }
 
-    const users = loadUsers()
-    const lowerQuery = query.trim().toLowerCase()
-    const matches = users.filter(
-      (u) =>
-        u.username.toLowerCase().includes(lowerQuery) ||
-        u.displayName.toLowerCase().includes(lowerQuery)
-    )
-    setResults(matches.slice(0, 6))
-    setIsOpen(true)
+    const timeout = setTimeout(async () => {
+      try {
+        const data: SearchResult[] = await apiFetch(
+          `/users/search?q=${encodeURIComponent(query.trim())}`
+        )
+        setResults(data.slice(0, 6))
+        setIsOpen(true)
+      } catch {
+        setResults([])
+      }
+    }, 300)
+
+    return () => clearTimeout(timeout)
   }, [query])
 
   // close dropdown when clicking outside
@@ -71,10 +81,10 @@ export function SearchBar() {
                 onClick={() => handleSelect(u.username)}
                 className="flex w-full items-center gap-3 p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-900"
               >
-                <Avatar src={u.avatarUrl} alt={u.displayName} className="h-8 w-8" />
+                <Avatar src={u.avatar_url} alt={u.display_name} className="h-8 w-8" />
                 <div>
                   <div className="text-sm font-semibold text-black dark:text-white">
-                    {u.displayName}
+                    {u.display_name}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
                     @{u.username}

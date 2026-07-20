@@ -46,3 +46,26 @@ export async function updateProfile(req: Request & { userId?: string }, res: Res
     res.status(500).json({ error: 'Something went wrong updating the profile.' })
   }
 }
+
+export async function searchUsers(req: Request, res: Response) {
+  const query = (req.query.q as string) || ''
+
+  if (!query.trim()) {
+    return res.json([])
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT id, username, display_name, avatar_url
+       FROM users
+       WHERE username ILIKE $1 OR display_name ILIKE $1
+       ORDER BY username
+       LIMIT 10`,
+      [`%${query.trim()}%`]
+    )
+    res.json(result.rows)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Something went wrong searching users.' })
+  }
+}
