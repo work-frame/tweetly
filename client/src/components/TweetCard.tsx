@@ -5,7 +5,7 @@ import { Avatar } from './Avatar'
 
 interface TweetCardProps {
   tweet: Tweet
-  author: User | undefined
+  author: Pick<User, 'username' | 'displayName' | 'avatarUrl'> | undefined
   currentUserId: string
   onToggleLike: (tweetId: string) => void
   onDelete: (tweetId: string) => void
