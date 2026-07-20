@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { requireAuth } from '../middleware/requireAuth'
-import { createTweet, deleteTweet, getFeed, getTweetsByUser } from '../controllers/tweetController'
+import { requireAuth } from '../middleware/requireAuth.js'
+import { createTweet, deleteTweet, getFeed, getTweetsByUser } from '../controllers/tweetController.js'
 
 const router = Router()
 

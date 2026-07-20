@@ -1,6 +1,6 @@
 import type { Response } from 'express'
-import { pool } from '../db'
-import type { AuthRequest } from '../middleware/requireAuth'
+import { pool } from '../db.js'
+import type { AuthRequest } from '../middleware/requireAuth.js'
 
 export async function toggleFollow(req: AuthRequest, res: Response) {
   const followerId = req.userId

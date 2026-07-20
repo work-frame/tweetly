@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { pool } from '../db'
+import { pool } from '../db.js'
 
 export async function getUserByUsername(req: Request, res: Response) {
   const { username } = req.params

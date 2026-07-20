@@ -1,13 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { pool } from './db'
-import authRoutes from './routes/authRoutes'
-import tweetRoutes from './routes/tweetRoutes'
-import followRoutes from './routes/followRoutes'
-import likeRoutes from './routes/likeRoutes'
-import userRoutes from './routes/userRoutes'
-import { requireAuth, type AuthRequest } from './middleware/requireAuth'
+import { pool } from './db.js'
+import authRoutes from './routes/authRoutes.js'
+import tweetRoutes from './routes/tweetRoutes.js'
+import followRoutes from './routes/followRoutes.js'
+import likeRoutes from './routes/likeRoutes.js'
+import userRoutes from './routes/userRoutes.js'
+import { requireAuth, type AuthRequest } from './middleware/requireAuth.js'
 
 dotenv.config()
 

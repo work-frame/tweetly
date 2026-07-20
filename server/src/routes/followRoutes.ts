@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { requireAuth } from '../middleware/requireAuth'
-import { toggleFollow, isFollowing } from '../controllers/followController'
+import { requireAuth } from '../middleware/requireAuth.js'
+import { toggleFollow, isFollowing } from '../controllers/followController.js'
 
 const router = Router()
 

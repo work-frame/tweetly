@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { verifyToken } from '../utils/jwt'
+import { verifyToken } from '../utils/jwt.js'
 
 export interface AuthRequest extends Request {
   userId?: string
@@ -13,6 +13,10 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
   }
 
   const token = authHeader.split(' ')[1]
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided.' })
+  }
 
   try {
     const payload = verifyToken(token)

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
-import { pool } from '../db'
-import { signToken } from '../utils/jwt'
+import { pool } from '../db.js'
+import { signToken } from '../utils/jwt.js'
 
 export async function signup(req: Request, res: Response) {
   const { displayName, username, email, password } = req.body
