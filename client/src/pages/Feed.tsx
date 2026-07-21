@@ -6,6 +6,7 @@ import { Composer } from '../components/Composer'
 import { TweetCard } from '../components/TweetCard'
 
 const PAGE_SIZE = 3
+const POLL_INTERVAL_MS = 15000
 
 export function Feed() {
   const { user } = useAuth()
@@ -15,13 +16,19 @@ export function Feed() {
 
   useEffect(() => {
     loadFeed()
+    const interval = setInterval(() => {
+      loadFeed(true)
+    }, POLL_INTERVAL_MS)
+    return () => clearInterval(interval)
   }, [])
 
-  async function loadFeed() {
-    setLoading(true)
+  async function loadFeed(isBackground = false) {
+    if (!isBackground) setLoading(true)
     const data = await tweetService.getFeed()
     setTweets(data)
-    setVisibleCount(PAGE_SIZE)
+    if (!isBackground) {
+      setVisibleCount(PAGE_SIZE)
+    }
     setLoading(false)
   }
 

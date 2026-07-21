@@ -9,6 +9,8 @@ interface CommentSectionProps {
   tweetId: string
 }
 
+const POLL_INTERVAL_MS = 10000
+
 function formatTimestamp(isoString: string): string {
   const date = new Date(isoString)
   const now = new Date()
@@ -33,17 +35,21 @@ export function CommentSection({ tweetId }: CommentSectionProps) {
 
   useEffect(() => {
     loadComments()
+    const interval = setInterval(() => {
+      loadComments(true)
+    }, POLL_INTERVAL_MS)
+    return () => clearInterval(interval)
   }, [tweetId])
 
-  async function loadComments() {
-    setLoading(true)
+  async function loadComments(isBackground = false) {
+    if (!isBackground) setLoading(true)
     try {
       const data = await commentService.getCommentsByTweet(tweetId)
       setComments(data)
     } catch {
-      setComments([])
+      if (!isBackground) setComments([])
     }
-    setLoading(false)
+    if (!isBackground) setLoading(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
