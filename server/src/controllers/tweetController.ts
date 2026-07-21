@@ -79,14 +79,27 @@ export async function getFeed(req: AuthRequest, res: Response) {
     )
 
     const tweetIds = result.rows.map((row) => row.id)
-    if (tweetIds.length > 0) {
-      await pool.query(
-        `UPDATE tweets SET views_count = views_count + 1 WHERE id = ANY($1::text[])`,
-        [tweetIds]
+    if (tweetIds.length > 0 && currentUserId) {
+      const insertResult = await pool.query(
+        `INSERT INTO tweet_views (tweet_id, user_id)
+         SELECT unnest($1::text[]), $2
+         ON CONFLICT (tweet_id, user_id) DO NOTHING
+         RETURNING tweet_id`,
+        [tweetIds, currentUserId]
       )
-      result.rows.forEach((row) => {
-        row.views_count = row.views_count + 1
-      })
+      const newlyViewedIds = new Set(insertResult.rows.map((r) => r.tweet_id))
+
+      if (newlyViewedIds.size > 0) {
+        await pool.query(
+          `UPDATE tweets SET views_count = views_count + 1 WHERE id = ANY($1::text[])`,
+          [Array.from(newlyViewedIds)]
+        )
+        result.rows.forEach((row) => {
+          if (newlyViewedIds.has(row.id)) {
+            row.views_count = row.views_count + 1
+          }
+        })
+      }
     }
 
     res.json(result.rows)
