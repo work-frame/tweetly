@@ -5,22 +5,25 @@ import type { AuthRequest } from '../middleware/requireAuth.js'
 const MAX_TWEET_LENGTH = 280
 
 export async function createTweet(req: AuthRequest, res: Response) {
-  const { content } = req.body
+  const { content, imageUrl } = req.body
   const authorId = req.userId
 
-  if (!content || !content.trim()) {
-    return res.status(400).json({ error: 'Tweet content cannot be empty.' })
+  const hasContent = content && content.trim().length > 0
+  const hasImage = imageUrl && imageUrl.trim().length > 0
+
+  if (!hasContent && !hasImage) {
+    return res.status(400).json({ error: 'Tweet must have text or an image.' })
   }
-  if (content.length > MAX_TWEET_LENGTH) {
+  if (content && content.length > MAX_TWEET_LENGTH) {
     return res.status(400).json({ error: `Tweet cannot exceed ${MAX_TWEET_LENGTH} characters.` })
   }
 
   try {
     const result = await pool.query(
-      `INSERT INTO tweets (content, author_id)
-       VALUES ($1, $2)
-       RETURNING id, content, author_id, created_at, views_count`,
-      [content.trim(), authorId]
+      `INSERT INTO tweets (content, author_id, image_url)
+       VALUES ($1, $2, $3)
+       RETURNING id, content, author_id, created_at, views_count, image_url`,
+      [hasContent ? content.trim() : '', authorId, hasImage ? imageUrl.trim() : null]
     )
     res.status(201).json(result.rows[0])
   } catch (err) {
@@ -59,7 +62,7 @@ export async function getFeed(req: AuthRequest, res: Response) {
   try {
     const result = await pool.query(
       `SELECT
-         t.id, t.content, t.created_at, t.author_id, t.views_count,
+         t.id, t.content, t.created_at, t.author_id, t.views_count, t.image_url,
          u.username, u.display_name, u.avatar_url,
          COUNT(DISTINCT l.id)::int AS likes_count,
          EXISTS(
@@ -100,7 +103,7 @@ export async function getTweetsByUser(req: AuthRequest, res: Response) {
   try {
     const result = await pool.query(
       `SELECT
-         t.id, t.content, t.created_at, t.author_id, t.views_count,
+         t.id, t.content, t.created_at, t.author_id, t.views_count, t.image_url,
          u.username, u.display_name, u.avatar_url,
          COUNT(DISTINCT l.id)::int AS likes_count,
          EXISTS(
