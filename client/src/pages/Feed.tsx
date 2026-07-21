@@ -25,9 +25,9 @@ export function Feed() {
     setLoading(false)
   }
 
-  async function handlePostTweet(content: string) {
+  async function handlePostTweet(content: string, imageUrl?: string) {
     if (!user) return
-    await tweetService.createTweet(content, user.id)
+    await tweetService.createTweet(content, imageUrl)
     await loadFeed()
   }
 

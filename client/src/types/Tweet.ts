@@ -6,4 +6,5 @@ export interface Tweet {
   likesCount: number
   likedByCurrentUser: boolean
   viewsCount: number
+  imageUrl: string | null
 }

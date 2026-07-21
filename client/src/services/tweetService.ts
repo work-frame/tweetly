@@ -10,6 +10,7 @@ interface ApiTweet {
   likes_count: number
   liked_by_current_user: boolean
   views_count: number
+  image_url: string | null
   username?: string
   display_name?: string
   avatar_url?: string
@@ -28,6 +29,7 @@ function mapTweet(apiTweet: ApiTweet): Tweet {
     likesCount: apiTweet.likes_count,
     likedByCurrentUser: apiTweet.liked_by_current_user,
     viewsCount: apiTweet.views_count,
+    imageUrl: apiTweet.image_url,
   }
 }
 
@@ -53,10 +55,10 @@ export const tweetService = {
     return data.map(mapTweet)
   },
 
-  async createTweet(content: string, _authorId: string): Promise<Tweet> {
+  async createTweet(content: string, imageUrl?: string): Promise<Tweet> {
     const data: ApiTweet = await apiFetch('/tweets', {
       method: 'POST',
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content, imageUrl }),
     })
     return mapTweet(data)
   },

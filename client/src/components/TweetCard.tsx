@@ -63,7 +63,17 @@ export function TweetCard({
               <span className="text-sm text-gray-400 dark:text-gray-600">{formatTimestamp(tweet.createdAt)}</span>
             </div>
 
-            <p className="mt-1 whitespace-pre-wrap text-gray-900 dark:text-gray-100">{tweet.content}</p>
+            {tweet.content && (
+              <p className="mt-1 whitespace-pre-wrap text-gray-900 dark:text-gray-100">{tweet.content}</p>
+            )}
+
+            {tweet.imageUrl && (
+              <img
+                src={tweet.imageUrl}
+                alt="Tweet attachment"
+                className="mt-2 max-h-96 w-full rounded-xl border border-gray-200 object-cover dark:border-gray-800"
+              />
+            )}
 
             <div className="mt-3 flex items-center gap-4">
               <button
