@@ -1,69 +1,108 @@
 # Tweetly
 
-A Twitter/X clone built as a learning project. Currently a fully working **frontend** running on mock data — no backend yet.
+A Twitter/X clone built as a learning project. Fully deployed, full-stack, with a real database — not a demo.
+
+**Live app:** https://tweetly-rose.vercel.app
+**Live API:** https://tweetly-t1jv.onrender.com
 
 ## Stack
 
-- **React** (Vite) + **TypeScript**
-- **Tailwind CSS**
-- **React Router**
-- **Context API** (auth + theme state)
-- **npm**
+**Frontend**
+- React (Vite) + TypeScript
+- Tailwind CSS
+- React Router
+- Context API (auth + theme state)
 
-Backend (planned): Node.js/Express + PostgreSQL + JWT auth.
+**Backend**
+- Node.js / Express + TypeScript
+- PostgreSQL (hosted on Neon), accessed via raw SQL with the `pg` library
+- JWT authentication + bcrypt password hashing
+- Cloudinary for image uploads (avatars and tweet images)
+
+**Deployment**
+- Frontend: Vercel
+- Backend: Render
+- Database: Neon
 
 ## Project structure
 
 ```
 tweetly/
-  client/              React frontend (this is what's built so far)
+  client/                 React frontend
     src/
-      components/      Reusable UI (TweetCard, Composer, Avatar, SearchBar, etc.)
-      pages/            Route-level views (Login, Signup, Feed, Profile)
-      layouts/          MainLayout (navbar, page shell)
-      context/          AuthContext, ThemeContext
-      services/         authService, tweetService, followService
-      mocks/            Mock data + localStorage-backed "database" helpers
-      types/            Shared TypeScript types (User, Tweet)
-  server/               Reserved for backend (not started yet)
+      components/         Reusable UI (TweetCard, Composer, Avatar, SearchBar, CommentSection, etc.)
+      pages/               Route-level views (Login, Signup, Feed, Profile)
+      layouts/             MainLayout (navbar, page shell)
+      context/             AuthContext, ThemeContext
+      services/            api.ts (shared fetch helper) + one service per resource
+                            (authService, tweetService, followService, userService,
+                            commentService, uploadService)
+      types/               Shared TypeScript types (User, Tweet, Comment)
+  server/                  Express backend
+    src/
+      controllers/         Route handlers (auth, tweets, follows, likes, users, comments)
+      routes/               Express routers, one per resource
+      middleware/           requireAuth (JWT verification)
+      utils/                 jwt.ts (sign/verify helpers)
+      db.ts                 PostgreSQL connection pool
+      index.ts              App entry point, CORS, route registration
+    db/
+      schema.sql            Full database schema
 ```
 
 ## Current status
 
 ### ✅ Working features
-- Sign up / log in / log out, with session persisted across page refreshes
+- Sign up / log in / log out, with real JWT-based sessions
 - Protected routes (redirects to login if not authenticated, returns you to where you were headed after logging in)
-- Home feed: post a tweet (280-char limit), like/unlike, delete your own tweets
+- Home feed: post a tweet (text and/or image, 280-char limit, optional caption), like/unlike, delete your own tweets
+- Comments on tweets — post, view, delete your own
+- View counts — increments once per unique viewer per tweet (not per page load)
+- Image upload on tweets and profile avatars, via Cloudinary, straight from device storage
 - "Load more" pagination on the feed
+- Live-ish updates — the feed and open comment sections poll the server periodically, so likes/comments from other users show up without a manual refresh
 - Profile pages: bio, avatar, joined date, follower/following counts
 - Follow / unfollow, with live count updates on both profiles
-- Edit profile (display name, bio, avatar URL)
-- Blank default avatar for new signups, with a click-to-enlarge view on profile pages
+- Edit profile (display name, bio, avatar photo upload)
 - Search bar to find users by username or display name
 - Full dark/light theme toggle, persisted across sessions
+- Click-to-enlarge avatar view on profile pages
 
-### ⚠️ Known limitation
-There is no real backend yet. All "persistence" — users, tweets, follows, sessions, theme — is stored in the browser's `localStorage`, acting as a stand-in database. This means:
-- Data is per-browser, not shared between devices or users
-- Clearing browser storage wipes all app data
+### ⚠️ Known limitations
+- **Free-tier cold starts**: the backend (Render free tier) spins down after ~15 minutes of inactivity. The first request after idle time can take up to a minute to respond while the server wakes up; subsequent requests are fast.
+- **Polling, not true real-time**: feed/comment updates from other users appear within ~10-15 seconds, not instantly. True real-time (WebSockets) is a stretch goal, not yet built.
 
-This was a deliberate choice to build and test the full UI/UX before the backend exists. The app was structured with a clean service-layer pattern (`services/authService.ts`, `services/tweetService.ts`, `services/followService.ts`) specifically so that swapping this mock layer for real API calls later won't require changing any components — only the internals of those three files.
-
-### ⬜ Not built yet
-- Real backend (Node/Express, PostgreSQL, JWT auth)
-- Real API endpoints with server-side validation and pagination
-- Deployment
-- Optional extras: retweets, replies/threads, image upload, notifications, responsive/mobile polish
+### ⬜ Not built yet (stretch goals)
+- Retweets
+- Replies/threads (as opposed to flat comments)
+- Notifications
+- Real-time updates via WebSockets (Socket.io)
+- Trending/hashtags
+- Direct messages
+- Rate limiting on posts
 
 ## Running locally
 
+### Frontend
 ```bash
 cd client
 npm install
 npm run dev
 ```
+Open the local URL shown in the terminal (usually `http://localhost:5173`).
 
-Then open the local URL shown in the terminal (usually `http://localhost:5173`).
+### Backend
+```bash
+cd server
+npm install
+npm run dev
+```
+Runs on `http://localhost:5000` by default. Requires a `.env` file (see `.env.example`) with:
+- `DATABASE_URL` — a PostgreSQL connection string (e.g. from [Neon](https://neon.tech))
+- `JWT_SECRET` — any long random string, used to sign auth tokens
+- `PORT` — defaults to 5000 if unset
+
+The database schema is in `server/db/schema.sql` — run it once against a fresh database to create the tables.
 
 ## Linting
 
