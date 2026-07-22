@@ -40,12 +40,12 @@ export function ProfileHeader({
   })
 
   return (
-    <div className="border-b border-gray-200 p-6 dark:border-gray-800">
+    <div className="border-b border-gray-200 p-4 sm:p-6 dark:border-gray-800">
       <div className="flex items-start justify-between">
         <Avatar
           src={profileUser.avatarUrl}
           alt={profileUser.displayName}
-          className="h-32 w-32"
+          className="h-20 w-20 sm:h-32 sm:w-32"
           clickable
         />
 
@@ -53,7 +53,7 @@ export function ProfileHeader({
           <button
             onClick={handleToggleFollow}
             disabled={loading}
-            className={`rounded-full px-4 py-1.5 font-semibold disabled:opacity-50 ${
+            className={`rounded-full px-3 py-1.5 text-sm font-semibold disabled:opacity-50 sm:px-4 sm:text-base ${
               isFollowing
                 ? 'border border-gray-300 bg-white text-black hover:border-red-300 hover:bg-red-50 hover:text-red-500 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-red-950/30'
                 : 'bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200'
@@ -65,14 +65,14 @@ export function ProfileHeader({
       </div>
 
       <div className="mt-3">
-        <h1 className="text-xl font-bold text-black dark:text-white">
+        <h1 className="text-lg font-bold text-black sm:text-xl dark:text-white">
           {profileUser.displayName}
         </h1>
         <p className="text-gray-500 dark:text-gray-400">@{profileUser.username}</p>
       </div>
 
       {profileUser.bio && (
-        <p className="mt-3 text-black dark:text-white">{profileUser.bio}</p>
+        <p className="mt-3 break-words text-black dark:text-white">{profileUser.bio}</p>
       )}
 
       <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Joined {joinedDate}</p>

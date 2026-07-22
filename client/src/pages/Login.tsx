@@ -36,12 +36,12 @@ export function Login() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-white dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4 dark:bg-black">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-8 shadow-md dark:border-gray-800 dark:bg-black"
+        className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-md sm:p-8 dark:border-gray-800 dark:bg-black"
       >
-        <h1 className="mb-6 text-2xl font-bold text-black dark:text-white">Log in to Tweetly</h1>
+        <h1 className="mb-6 text-xl font-bold text-black sm:text-2xl dark:text-white">Log in to Tweetly</h1>
 
         {error && (
           <div className="mb-4 rounded bg-red-100 p-2 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">

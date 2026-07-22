@@ -39,10 +39,10 @@ export function Signup() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-white dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-8 dark:bg-black">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-8 shadow-md dark:border-gray-800 dark:bg-black"
+        className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-md sm:p-8 dark:border-gray-800 dark:bg-black"
       >
         <h1 className="mb-6 text-2xl font-bold text-black dark:text-white">Join Tweetly</h1>
 
@@ -60,7 +60,7 @@ export function Signup() {
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-base text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
             placeholder="John Doe"
           />
         </div>
@@ -73,7 +73,7 @@ export function Signup() {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-base text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
             placeholder="johndoe"
           />
         </div>
@@ -86,7 +86,7 @@ export function Signup() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-base text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
             placeholder="you@example.com"
           />
         </div>
@@ -99,7 +99,7 @@ export function Signup() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-base text-black focus:border-black focus:outline-none dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white"
             placeholder="••••••••"
           />
         </div>

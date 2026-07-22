@@ -17,14 +17,16 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      <nav className="flex items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 py-3 dark:border-gray-800 dark:bg-black">
-        <Link to="/" className="text-xl font-bold text-black dark:text-white">
+      <nav className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 bg-white px-3 py-2 sm:gap-4 sm:px-6 sm:py-3 dark:border-gray-800 dark:bg-black">
+        <Link to="/" className="text-lg font-bold text-black sm:text-xl dark:text-white">
           Tweetly
         </Link>
 
-        <SearchBar />
+        <div className="order-3 w-full sm:order-none sm:w-auto sm:flex-1 sm:max-w-xs">
+          <SearchBar />
+        </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           <Link
             to="/"
             className="text-sm font-medium text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -34,17 +36,17 @@ export function MainLayout({ children }: { children: ReactNode }) {
           {user && (
             <Link
               to={`/profile/${user.username}`}
-              className="text-sm font-medium text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
+              className="hidden text-sm font-medium text-gray-700 hover:text-black sm:inline dark:text-gray-300 dark:hover:text-white"
             >
               Profile
             </Link>
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={toggleTheme}
-            className="rounded-full border border-gray-300 p-2 text-sm hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-900"
+            className="rounded-full border border-gray-300 p-1.5 text-sm hover:bg-gray-100 sm:p-2 dark:border-gray-700 dark:hover:bg-gray-900"
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? '☀️' : '🌙'}
@@ -52,13 +54,15 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
           {user && (
             <>
-             <Avatar src={user.avatarUrl} alt={user.displayName} className="h-8 w-8" />
-              <span className="text-sm font-medium text-black dark:text-white">
+              <Link to={`/profile/${user.username}`}>
+                <Avatar src={user.avatarUrl} alt={user.displayName} className="h-8 w-8" />
+              </Link>
+              <span className="hidden text-sm font-medium text-black sm:inline dark:text-white">
                 {user.displayName}
               </span>
               <button
                 onClick={handleLogout}
-                className="rounded-full bg-black px-3 py-1 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                className="rounded-full bg-black px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-800 sm:px-3 sm:py-1 sm:text-sm dark:bg-white dark:text-black dark:hover:bg-gray-200"
               >
                 Log out
               </button>
@@ -67,7 +71,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-2xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-2xl px-2 py-4 sm:px-4 sm:py-6">{children}</main>
     </div>
   )
 }

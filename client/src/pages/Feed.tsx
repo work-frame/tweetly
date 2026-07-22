@@ -68,7 +68,7 @@ export function Feed() {
   const hasMore = visibleCount < tweets.length
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
+    <div className="rounded-none border border-gray-200 bg-white sm:rounded-xl dark:border-gray-800 dark:bg-black">
       <Composer onSubmit={handlePostTweet} />
 
       {loading ? (

@@ -82,7 +82,7 @@ export function Profile() {
   const isOwnProfile = currentUser?.id === profileUser.id
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
+    <div className="rounded-none border border-gray-200 bg-white sm:rounded-xl dark:border-gray-800 dark:bg-black">
       {isEditing && currentUser ? (
         <EditProfileForm currentUser={currentUser} onClose={handleEditClose} />
       ) : (

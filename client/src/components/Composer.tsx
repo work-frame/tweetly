@@ -59,7 +59,7 @@ export function Composer({ onSubmit }: ComposerProps) {
   }
 
   return (
-    <div className="border-b border-gray-200 p-4 dark:border-gray-800">
+    <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-gray-800">
       {error && (
         <div className="mb-2 rounded bg-red-100 p-2 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">
           {error}
@@ -71,15 +71,15 @@ export function Composer({ onSubmit }: ComposerProps) {
         onChange={(e) => setContent(e.target.value)}
         placeholder="What's happening?"
         rows={3}
-        className="w-full resize-none border-none bg-transparent text-lg text-black placeholder-gray-400 focus:outline-none dark:text-white dark:placeholder-gray-500"
+        className="w-full resize-none border-none bg-transparent text-base text-black placeholder-gray-400 focus:outline-none sm:text-lg dark:text-white dark:placeholder-gray-500"
       />
 
       {imageUrl && (
-        <div className="relative mt-2 inline-block">
+        <div className="relative mt-2 inline-block w-full sm:w-auto">
           <img
             src={imageUrl}
             alt="Upload preview"
-            className="max-h-64 rounded-xl border border-gray-200 dark:border-gray-800"
+            className="max-h-48 w-full rounded-xl border border-gray-200 object-cover sm:max-h-64 sm:w-auto dark:border-gray-800"
           />
           <button
             onClick={removeImage}
@@ -111,7 +111,7 @@ export function Composer({ onSubmit }: ComposerProps) {
         <button
           onClick={handleSubmit}
           disabled={!isValid || posting || uploading}
-          className="rounded-full bg-black px-4 py-1.5 font-semibold text-white hover:bg-gray-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+          className="rounded-full bg-black px-3 py-1.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50 sm:px-4 sm:text-base dark:bg-white dark:text-black dark:hover:bg-gray-200"
         >
           {posting ? 'Posting...' : 'Post'}
         </button>
